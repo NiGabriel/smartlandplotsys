@@ -1,0 +1,405 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/LandSaleEscrow.sol": {
+      "lastModificationDate": 1781601728868,
+      "contentHash": "4369efd49648a75e3ec7aaca452f94d2",
+      "sourceName": "contracts/LandSaleEscrow.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./storage/LandEscrowStorage.sol",
+        "./modifiers/AccessModifiers.sol",
+        "./models/User.sol",
+        "./enums/UserRole.sol",
+        "./errors/LandErrors.sol",
+        "./models/Land.sol",
+        "./enums/LandStatus.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "LandSaleEscrow"
+      ]
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/storage/LandEscrowStorage.sol": {
+      "lastModificationDate": 1781601217819,
+      "contentHash": "c7e80a2dfae0383f2c13a17ce416ec19",
+      "sourceName": "contracts/storage/LandEscrowStorage.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../models/User.sol",
+        "../models/Land.sol",
+        "../models/Transaction.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "LandEscrowStorage"
+      ]
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/modifiers/AccessModifiers.sol": {
+      "lastModificationDate": 1781601246453,
+      "contentHash": "5faea447b49e0caf66ca881bd99d1ace",
+      "sourceName": "contracts/modifiers/AccessModifiers.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../errors/LandErrors.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "AccessModifiers"
+      ]
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/models/User.sol": {
+      "lastModificationDate": 1781600808342,
+      "contentHash": "3166c73f03d180f011bd2d1f71f1fabe",
+      "sourceName": "contracts/models/User.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../enums/UserRole.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/models/Land.sol": {
+      "lastModificationDate": 1781600839565,
+      "contentHash": "ff1e37603866a9e87e328ace9b6d7a76",
+      "sourceName": "contracts/models/Land.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../enums/LandStatus.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/enums/UserRole.sol": {
+      "lastModificationDate": 1781600621670,
+      "contentHash": "eaef7785b9de1c9c6be41f0315d1895c",
+      "sourceName": "contracts/enums/UserRole.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/enums/LandStatus.sol": {
+      "lastModificationDate": 1781600737411,
+      "contentHash": "f194b5c699276f1c560fb4385453a05c",
+      "sourceName": "contracts/enums/LandStatus.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/errors/LandErrors.sol": {
+      "lastModificationDate": 1781600899255,
+      "contentHash": "53b3bad042d8baf64316ac2e14bbcfe4",
+      "sourceName": "contracts/errors/LandErrors.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/models/Transaction.sol": {
+      "lastModificationDate": 1781600865680,
+      "contentHash": "618ad36652216bfcf1949992caf555f2",
+      "sourceName": "contracts/models/Transaction.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/enums/TransactionStatus.sol": {
+      "lastModificationDate": 1781600785713,
+      "contentHash": "e9f19931cebde91fed985d981eb65faa",
+      "sourceName": "contracts/enums/TransactionStatus.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": []
+    },
+    "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/interfaces/IEvents.sol": {
+      "lastModificationDate": 1781601445297,
+      "contentHash": "ad790ce89a2248a5e1798a332417eeb3",
+      "sourceName": "contracts/interfaces/IEvents.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IEvents"
+      ]
+    }
+  }
+}

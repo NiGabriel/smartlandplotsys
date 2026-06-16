@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Riverfront Plot",
+    "location": "Sector 5",
+    "size": 120,
+    "ownerId": 1,
+    "price": 0,
+    "status": "Registered",
+    "exists": true
+  },
+  {
+    "id": 2,
+    "title": "Hillside Acre",
+    "location": "East Hill",
+    "size": 200,
+    "ownerId": 1,
+    "price": 0,
+    "status": "Registered",
+    "exists": true
+  },
+  {
+    "id": 3,
+    "title": "Demo Plot",
+    "location": "North Ridge",
+    "size": 150,
+    "ownerId": 3,
+    "price": 0,
+    "status": "Registered",
+    "exists": true
+  }
+]
