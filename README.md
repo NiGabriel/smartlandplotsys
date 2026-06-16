@@ -11,6 +11,34 @@
 - Solidity compiler version `0.8.28`
 - `package.json` includes Hardhat dependencies and scripts for compile, deploy, and data management
 
+## Quick Commands
+
+Use these quick commands to get started and run the test suite.
+
+```bash
+# install dependencies
+npm install
+
+# compile contracts
+npm run compile
+
+# run tests (preferred via npm)
+npm test
+
+# optional: initialize sample data files
+npm run init-data
+
+# inspect local dummy data
+npm run fetch-data
+
+# add user / land to local data files
+npm run add-user -- "Full Name" "Role" "0xWallet"
+npm run add-land -- "Title" "Location" 100 "OwnerWallet"
+
+# deploy to a local node (start node first with `npx hardhat node`)
+npm run deploy
+```
+
 ## Contract Structure
 
 The project is organized into multiple logical folders:
@@ -147,3 +175,75 @@ Available scripts in `package.json`:
 ## Notes
 
 The contract stores state on-chain, while the scripts store dummy data locally in `data/*.txt`. This separation is intentional for development and demo purposes.
+
+## Testing the Project (Quick Start)
+
+Follow these steps to run the unit tests and exercise the local data scripts.
+
+1. Install dependencies (if not already installed):
+
+```bash
+npm install
+```
+
+2. Compile contracts:
+
+```bash
+npm run compile
+```
+
+3. Initialize the local dummy data files (optional — `data/*.txt` will be created/overwritten):
+
+```bash
+npm run init-data
+```
+
+4. Run the unit tests (Hardhat + Mocha/Chai):
+
+```bash
+npx hardhat test
+```
+
+You should see output similar to:
+
+```
+    LandSaleEscrow
+        ✔ should set registrar to deployer
+        ✔ should register a user and emit UserRegistered
+        ✔ should register land for an existing user and emit LandRegistered
+        ✔ should revert when trying to register land with an unregistered address
+        ✔ should revert when trying to get a non-existent user
+        ✔ should revert when trying to get a non-existent land record
+
+    6 passing
+```
+
+5. Use the data scripts to inspect or modify local dummy data:
+
+```bash
+npm run fetch-data          # prints data/users.txt and data/lands.txt
+npm run add-user -- "Name" "Role" "0xWallet"   # append user
+npm run add-land -- "Title" "Location" 100 "OwnerWallet"  # append land
+```
+
+6. Deploy locally (optional):
+
+Start a local Hardhat node in one terminal:
+
+```bash
+npx hardhat node
+```
+
+In another terminal deploy to the local node:
+
+```bash
+npm run deploy
+```
+
+This will print the deployed `LandSaleEscrow` contract address.
+
+## Test and Script Notes
+
+- The unit tests live in `test/LandSaleEscrow.test.js` and exercise registration and error paths.
+- The scripts under `scripts/` operate on the local `data/*.txt` JSON files; they are not connected to the on-chain state by default. Use `scripts/deploy.js` plus a quick `scripts/registerOnChain.js` (not included) to sync local data to chain if needed.
+- If you get an error about versions or `deployed()` vs `waitForDeployment()`, ensure your Hardhat and Ethers versions match the ones in `package.json`.
