@@ -2,10 +2,21 @@
   "name": "smartlandplotsys",
   "version": "1.0.0",
   "description": "Smart land plot system",
+  "homepage": "https://github.com/NiGabriel/smartlandplotsys#readme",
+  "bugs": {
+    "url": "https://github.com/NiGabriel/smartlandplotsys/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NiGabriel/smartlandplotsys.git"
+  },
   "license": "ISC",
   "author": "Group 3",
   "type": "commonjs",
   "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
