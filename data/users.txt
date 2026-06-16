@@ -1,23 +1,23 @@
 [
   {
     "id": 1,
-    "fullName": "Gabriel N.",
+    "fullName": "MAHEREZO Joseph",
     "wallet": "0x0000000000000000000000000000000000000001",
     "role": "Seller",
     "exists": true
   },
   {
     "id": 2,
-    "fullName": "Asha K.",
-    "wallet": "0x0000000000000000000000000000000000000002",
+    "fullName": "Aisha Kagwa",
+    "wallet": "0x0000000000000000000065000000000000000002",
     "role": "Buyer",
     "exists": true
   },
   {
     "id": 3,
-    "fullName": "Test User",
-    "wallet": "0x0000000000000000000000000000000000000003",
-    "role": "Buyer",
+    "fullName": "Mugenzi Christine",
+    "wallet": "0x0000000000000000000065000000000000000092",
+    "role": "Registrar",
     "exists": true
   }
 ]

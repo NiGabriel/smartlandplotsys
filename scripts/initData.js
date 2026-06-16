@@ -3,15 +3,15 @@ const { saveUsers, saveLands } = require("./dataHelpers");
 const defaultUsers = [
     {
         id: 1,
-        fullName: "Gabriel N.",
+        fullName: "MAHEREZO Joseph",
         wallet: "0x0000000000000000000000000000000000000001",
         role: "Seller",
         exists: true,
     },
     {
         id: 2,
-        fullName: "Asha K.",
-        wallet: "0x0000000000000000000000000000000000000002",
+        fullName: "Aisha Kagwa",
+        wallet: "0x0000000000000000000065000000000000000002",
         role: "Buyer",
         exists: true,
     },
@@ -20,8 +20,8 @@ const defaultUsers = [
 const defaultLands = [
     {
         id: 1,
-        title: "Riverfront Plot",
-        location: "Sector 5",
+        title: "Masaka Plot",
+        location: "Kigali City",
         size: 120,
         ownerId: 1,
         price: 0,
@@ -30,8 +30,8 @@ const defaultLands = [
     },
     {
         id: 2,
-        title: "Hillside Acre",
-        location: "East Hill",
+        title: "Nyagatare Plot",
+        location: "Eastern Province",
         size: 200,
         ownerId: 1,
         price: 0,

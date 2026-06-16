@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/LandSaleEscrow.sol": {
-      "lastModificationDate": 1781601728868,
-      "contentHash": "4369efd49648a75e3ec7aaca452f94d2",
+      "lastModificationDate": 1781614421078,
+      "contentHash": "a16cce63584bdb1fd85fecf1afb655ba",
       "sourceName": "contracts/LandSaleEscrow.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -36,7 +36,10 @@
         "./enums/UserRole.sol",
         "./errors/LandErrors.sol",
         "./models/Land.sol",
-        "./enums/LandStatus.sol"
+        "./enums/LandStatus.sol",
+        "./enums/TransactionStatus.sol",
+        "./models/Transaction.sol",
+        "./interfaces/IEvents.sol"
       ],
       "versionPragmas": [
         "^0.8.28"
@@ -86,8 +89,8 @@
       ]
     },
     "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/modifiers/AccessModifiers.sol": {
-      "lastModificationDate": 1781601246453,
-      "contentHash": "5faea447b49e0caf66ca881bd99d1ace",
+      "lastModificationDate": 1781605754712,
+      "contentHash": "ba10956d59e9b502be235123ed64dfb7",
       "sourceName": "contracts/modifiers/AccessModifiers.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -298,8 +301,8 @@
       "artifacts": []
     },
     "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/models/Transaction.sol": {
-      "lastModificationDate": 1781600865680,
-      "contentHash": "618ad36652216bfcf1949992caf555f2",
+      "lastModificationDate": 1781605754727,
+      "contentHash": "f0701162a2586c0cbb025785a1c5c755",
       "sourceName": "contracts/models/Transaction.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -325,15 +328,17 @@
           }
         }
       },
-      "imports": [],
+      "imports": [
+        "../enums/TransactionStatus.sol"
+      ],
       "versionPragmas": [
         "^0.8.28"
       ],
       "artifacts": []
     },
     "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/enums/TransactionStatus.sol": {
-      "lastModificationDate": 1781600785713,
-      "contentHash": "e9f19931cebde91fed985d981eb65faa",
+      "lastModificationDate": 1781609420765,
+      "contentHash": "2b17df657ba16af59931704a923ba2fb",
       "sourceName": "contracts/enums/TransactionStatus.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -366,8 +371,8 @@
       "artifacts": []
     },
     "/media/gabe/MyData2/MINE/karongi/2026/Trainings/smartlandplotsys/contracts/interfaces/IEvents.sol": {
-      "lastModificationDate": 1781601445297,
-      "contentHash": "ad790ce89a2248a5e1798a332417eeb3",
+      "lastModificationDate": 1781614398069,
+      "contentHash": "a48718e761efd48543ba9d3e7a5da870",
       "sourceName": "contracts/interfaces/IEvents.sol",
       "solcConfig": {
         "version": "0.8.28",

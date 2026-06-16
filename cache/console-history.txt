@@ -1,0 +1,49 @@
+console.log("✓ User registered by registrar");
+await tx.wait();
+let tx = await escrow.registerUser("Alice", seller.address, 0);
+console.log("Test 1: Registrar registers user...");
+const [registrar, seller, buyer] = await ethers.getSigners();
+const escrow = await ethers.getContractAt(    "LandSaleEscrow",    "0x5FbDB2315678afecb367f032d93F642f64180aa3");
+escrow = await ethers.getContractAt(    "LandSaleEscrow",    "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+// Connect to the deployed contractconst escrow = await ethers.getContractAt(    "LandSaleEscrow",    "0x5FbDB2315678afecb367f032d93F642f64180aa3");// Get signersconst [registrar, seller, buyer] = await ethers.getSigners();// Test 1: Registrar CAN register a user (success)console.log("Test 1: Registrar registers user...");let tx = await escrow.registerUser("Alice", seller.address, 0);await tx.wait();console.log("✓ User registered by registrar");// Test 2: Non-registrar CANNOT register a user (failure)console.log("\nTest 2: Seller tries to register user...");try {    tx = await escrow.connect(seller).registerUser("Bob", buyer.address, 1);    await tx.wait();    console.log("✗ Seller registered user (unexpected!)");} catch (err) {    if (err.message.includes("Unauthorized")) {        console.log("✓ Seller blocked (Unauthorized)");    }}// Test 3: Registrar CAN register land (success)console.log("\nTest 3: Registrar registers land...");tx = await escrow.registerLand("Plot A", "Sector 1", 100, 1);await tx.wait();console.log("✓ Land registered by registrar");// Test 4: Non-registrar CANNOT register land (failure)console.log("\nTest 4: Buyer tries to register land...");try {    tx = await escrow.connect(buyer).registerLand("Plot B", "Sector 2", 200, 1);    await tx.wait();    console.log("✗ Buyer registered land (unexpected!)");} catch (err) {    if (err.message.includes("Unauthorized")) {        console.log("✓ Buyer blocked (Unauthorized)");    }}// Exit console.exit
+.exit
+// Exit console
+}
+    }
+        console.log("✓ Buyer blocked (Unauthorized)");
+    if (err.message.includes("Unauthorized")) {
+} catch (err) {
+    console.log("✗ Buyer registered land (unexpected!)");
+    await tx.wait();
+    tx = await escrow.connect(buyer).registerLand("Plot B", "Sector 2", 200, 1);
+try {
+console.log("\nTest 4: Buyer tries to register land...");
+// Test 4: Non-registrar CANNOT register land (failure)
+console.log("✓ Land registered by registrar");
+await tx.wait();
+tx = await escrow.registerLand("Plot A", "Sector 1", 100, 1);
+console.log("\nTest 3: Registrar registers land...");
+// Test 3: Registrar CAN register land (success)
+}
+    }
+        console.log("✓ Seller blocked (Unauthorized)");
+    if (err.message.includes("Unauthorized")) {
+} catch (err) {
+    console.log("✗ Seller registered user (unexpected!)");
+    await tx.wait();
+    tx = await escrow.connect(seller).registerUser("Bob", buyer.address, 1);
+try {
+console.log("\nTest 2: Seller tries to register user...");
+// Test 2: Non-registrar CANNOT register a user (failure)
+console.log("✓ User registered by registrar");
+await tx.wait();
+let tx = await escrow.registerUser("Alice", seller.address, 0);
+console.log("Test 1: Registrar registers user...");
+// Test 1: Registrar CAN register a user (success)
+const [registrar, seller, buyer] = await ethers.getSigners();
+// Get signers
+);
+    "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    "LandSaleEscrow",
+const escrow = await ethers.getContractAt(
+// Connect to the deployed contract

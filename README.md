@@ -2,248 +2,375 @@
 
 ## Project Overview
 
-`smartlandplotsys` is a Solidity-based land sales escrow system built with Hardhat. The app models users, land records, and an escrow/deployment flow via the `LandSaleEscrow` contract. It also includes local dummy data files and Node scripts to manage those files for development and testing.
+`smartlandplotsys` is a Solidity-based land sale escrow system built with Hardhat. It supports registrar-controlled registration, seller listing, buyer escrow payments, and registrar-managed approval, transfer, and reversal.
 
-## Environment Setup
+The project includes:
 
-- Node.js and npm installed
-- Hardhat project configured with `hardhat.config.js`
-- Solidity compiler version `0.8.28`
-- `package.json` includes Hardhat dependencies and scripts for compile, deploy, and data management
+- `contracts/LandSaleEscrow.sol`: escrow contract logic
+- `contracts/storage/LandEscrowStorage.sol`: shared state variables
+- `contracts/models/`: `User`, `Land`, `TransactionRecord` structs
+- `contracts/enums/`: `UserRole`, `LandStatus`, `TransactionStatus`
+- `contracts/errors/LandErrors.sol`: custom revert errors
+- `contracts/interfaces/IEvents.sol`: event definitions (implemented by LandSaleEscrow)
+- `scripts/`: deployment and local data / on-chain sync scripts
+- `data/`: dummy JSON data files
+- `test/`: Hardhat unit tests
 
-## Quick Commands
+## Roles and Permissions
 
-Use these quick commands to get started and run the test suite.
+### Registrar
+
+The contract deployer is the registrar. Registrar-only functions include:
+
+- `registerUser(fullName, wallet, role)`
+- `registerLand(title, location, size, ownerId)`
+- `approveSale(transactionId)`
+- `finalizeTransaction(transactionId)`
+- `reverseTransaction(transactionId)`
+
+### Seller
+
+Seller responsibilities:
+
+- register land via registrar
+- list land for sale with `listLand(landId, price)`
+- inspect land via `getLand(landId)`
+- verify transaction progress via `getTransaction(transactionId)`
+
+### Buyer
+
+Buyer responsibilities:
+
+- verify land using `getLand(landId)`
+- initiate purchase with `initiatePurchase(landId)`
+- pay escrow using `payForTransaction(transactionId)`
+- verify progress using `getTransaction(transactionId)`
+
+## Setup
+
+Install dependencies and compile the contracts:
 
 ```bash
-# install dependencies
 npm install
-
-# compile contracts
 npm run compile
-
-# run tests (preferred via npm)
-npm test
-
-# optional: initialize sample data files
-npm run init-data
-
-# inspect local dummy data
-npm run fetch-data
-
-# add user / land to local data files
-npm run add-user -- "Full Name" "Role" "0xWallet"
-npm run add-land -- "Title" "Location" 100 "OwnerWallet"
-
-# deploy to a local node (start node first with `npx hardhat node`)
-npm run deploy
 ```
 
-## Contract Structure
+## Data Files
 
-The project is organized into multiple logical folders:
-
-- `contracts/`
-  - `LandSaleEscrow.sol`: main contract for user and land registration
-  - `storage/LandEscrowStorage.sol`: shared storage state and mappings
-  - `models/`: custom `struct` definitions
-  - `enums/`: reusable status and role enums
-  - `errors/`: custom error types
-- `scripts/`: deployment and local data management scripts
-- `data/`: dummy data files used by scripts
-- `test/`: test folder (currently empty)
-
-## Data Types and Structs
-
-This project uses the following Solidity primitives:
-
-- `uint256` for IDs, sizes, prices, and timestamps
-- `string` for text fields like names, title, and location
-- `address` for wallet accounts
-- `bool` for existence checks
-- `enum UserRole` for user roles (`Seller`, `Buyer`, `Registrar`)
-- `enum LandStatus` for land lifecycle states (`Registered`, `Listed`, `PendingApproval`, `Sold`)
-
-Defined structs:
-
-- `User`: stores user profile data
-- `Land`: stores land metadata
-- `TransactionRecord`: stores transaction details (not yet used in `LandSaleEscrow`)
-
-## Line-by-Line Explanation of `contracts/LandSaleEscrow.sol`
-
-1. `// SPDX-License-Identifier: MIT`
-   - License metadata for the contract.
-2. `pragma solidity ^0.8.28;`
-   - Uses Solidity compiler version 0.8.28 or higher.
-3. `import "./storage/LandEscrowStorage.sol";`
-   - Imports storage contract containing shared state variables.
-4. `import "./modifiers/AccessModifiers.sol";`
-   - Imports a modifier contract, currently unused in `LandSaleEscrow` but available for future access control.
-5. `import "./models/User.sol";`
-   - Imports the `User` struct definition.
-6. `import "./enums/UserRole.sol";`
-   - Imports user role enum.
-7. `import "./errors/LandErrors.sol";`
-   - Imports custom revert errors.
-8. `import "./models/Land.sol";`
-   - Imports the `Land` struct definition.
-9. `import "./enums/LandStatus.sol";`
-   - Imports land status enum.
-10. `contract LandSaleEscrow is LandEscrowStorage {`
-    - Declares the main contract and inherits shared storage state.
-11. `event UserRegistered(uint256 userId, address wallet);`
-    - Event emitted after a user is successfully registered.
-12. `event LandRegistered(uint256 landId, uint256 ownerId);`
-    - Event emitted after land is successfully registered.
-13. `constructor() { registrar = msg.sender; }`
-    - Sets the deployer as the registrar.
-14. `function registerUser(string memory fullName, UserRole role) public {`
-    - Public function to register a new user.
-15. `if (bytes(fullName).length == 0) { revert InvalidData(); }`
-    - Validates that the user name is not empty.
-16. `if (msg.sender == address(0)) { revert InvalidAddress(); }`
-    - Defensive check for an invalid sender address.
-17. `nextUserId++;`
-    - Increments the next available user ID.
-18. `users[nextUserId] = User({ ... });`
-    - Stores the new user in the `users` mapping.
-19. `walletToUserId[msg.sender] = nextUserId;`
-    - Maps the sender wallet to the new user ID.
-20. `userIds.push(nextUserId);`
-    - Appends the user ID to the `userIds` array.
-21. `emit UserRegistered(nextUserId, msg.sender);`
-    - Emits an event so off-chain apps can track new users.
-22. `function registerLand(string memory title, string memory location, uint256 size) public {`
-    - Public function to add new land.
-23. `uint256 ownerId = walletToUserId[msg.sender];`
-    - Finds the owner ID using the sender wallet.
-24. `if (ownerId == 0) { revert UserNotFound(); }`
-    - Requires the caller to be a registered user.
-25. `nextLandId++;`
-    - Increments the next available land ID.
-26. `lands[nextLandId] = Land({ ... });`
-    - Stores the new land record in the `lands` mapping.
-27. `landIds.push(nextLandId);`
-    - Adds the land ID to the `landIds` array.
-28. `emit LandRegistered(nextLandId, ownerId);`
-    - Emits an event for the new land record.
-29. `function getUser(uint256 userId) public view returns (User memory) {`
-    - Fetches a user by ID.
-30. `if (!users[userId].exists) { revert UserNotFound(); }`
-    - Reverts if the user is missing.
-31. `return users[userId];`
-    - Returns the user struct.
-32. `function getLand(uint256 landId) public view returns (Land memory) {`
-    - Fetches a land record by ID.
-33. `if (!lands[landId].exists) { revert LandNotFound(); }`
-    - Reverts if the land is missing.
-34. `return lands[landId];`
-    - Returns the land struct.
-35. `}`
-    - Ends the contract.
-
-## Data files
-
-Dummy files are stored in `data/`:
+Dummy data is stored in:
 
 - `data/users.txt`
 - `data/lands.txt`
 
-These files contain JSON-formatted arrays and are used by local Node scripts to simulate fetch/add operations.
+These files are JSON arrays used by local scripts for testing and syncing.
 
-## Scripts
+## Available Scripts
 
-Available scripts in `package.json`:
+- `npm run compile` — compile contracts
+- `npm test` — run unit tests
+- `npm run test:registrar` — run registrar control authorization tests (requires `npx hardhat node` running)
+- `npm run deploy` — deploy contract to localhost
+- `npm run init-data` — create sample `data/users.txt` and `data/lands.txt`
+- `npm run fetch-data` — print local dummy data
+- `npm run add-user -- "Full Name" "Role" "0xWallet"` — add a user to local data; role must be `Seller`, `Buyer`, or `Registrar`
+- `npm run add-land -- "Title" "Location" 100 "OwnerWallet"` — add a land record locally; owner wallet must exist in `data/users.txt`
+- `npm run sync-onchain -- <ContractAddress> --impersonate` — sync local data to deployed contract
 
-- `npm run compile`
-- `npm test`
-- `npm run deploy`
-- `npm run init-data`
-- `npm run fetch-data`
-- `npm run add-user -- "Full Name" "Seller" "0x..."`
-- `npm run add-land -- "Title" "Location" 100 "0x..."`
+## Quick Start
 
-### How the scripts work
-
-- `deploy`: deploys the `LandSaleEscrow` contract to the configured Hardhat network.
-- `init-data`: writes initial dummy records into `data/users.txt` and `data/lands.txt`.
-- `fetch-data`: reads the dummy data files and prints their contents.
-- `add-user`: appends a new user record to `data/users.txt`.
-- `add-land`: appends a new land record to `data/lands.txt`.
-
-## Notes
-
-The contract stores state on-chain, while the scripts store dummy data locally in `data/*.txt`. This separation is intentional for development and demo purposes.
-
-## Testing the Project (Quick Start)
-
-Follow these steps to run the unit tests and exercise the local data scripts.
-
-1. Install dependencies (if not already installed):
-
-```bash
-npm install
-```
-
-2. Compile contracts:
-
-```bash
-npm run compile
-```
-
-3. Initialize the local dummy data files (optional — `data/*.txt` will be created/overwritten):
+### 1. Initialize sample data
 
 ```bash
 npm run init-data
 ```
 
-4. Run the unit tests (Hardhat + Mocha/Chai):
+### 2. Inspect local test data
 
 ```bash
-npx hardhat test
+npm run fetch-data
 ```
 
-You should see output similar to:
-
-```
-    LandSaleEscrow
-        ✔ should set registrar to deployer
-        ✔ should register a user and emit UserRegistered
-        ✔ should register land for an existing user and emit LandRegistered
-        ✔ should revert when trying to register land with an unregistered address
-        ✔ should revert when trying to get a non-existent user
-        ✔ should revert when trying to get a non-existent land record
-
-    6 passing
-```
-
-5. Use the data scripts to inspect or modify local dummy data:
+### 3. Add a new user locally
 
 ```bash
-npm run fetch-data          # prints data/users.txt and data/lands.txt
-npm run add-user -- "Name" "Role" "0xWallet"   # append user
-npm run add-land -- "Title" "Location" 100 "OwnerWallet"  # append land
+npm run add-user -- "Test User" "Buyer" "0x0000000000000000000000000000000000000003"
 ```
 
-6. Deploy locally (optional):
+> **Important**: Wallet addresses must be valid Ethereum addresses (40 hex characters after `0x`).
+> Invalid formats like `0xwallet` will cause the sync script to fail with a `resolveName` error.
 
-Start a local Hardhat node in one terminal:
+Examples of valid addresses:
+- `0x0000000000000000000000000000000000000001`
+- `0x1234567890123456789012345678901234567890`
+- `0xabcdefabcdefabcdefabcdefabcdefabcdefabcd`
+
+### 4. Add a new land entry locally
+
+```bash
+npm run add-land -- "Demo Plot" "North Ridge" 150 "0x0000000000000000000000000000000000000003"
+```
+
+### 5. Deploy to a local node
+
+Open a terminal and start Hardhat node:
 
 ```bash
 npx hardhat node
 ```
 
-In another terminal deploy to the local node:
+> Note: the correct command is `npx hardhat node`. A common typo is `npx hardhart node`, which will fail with an `npm ERR! 404` error.
+
+Open another terminal and deploy:
 
 ```bash
 npm run deploy
 ```
 
-This will print the deployed `LandSaleEscrow` contract address.
+Copy the deployed contract address from the output.
 
-## Test and Script Notes
+### 6. Sync local data to the deployed contract
 
-- The unit tests live in `test/LandSaleEscrow.test.js` and exercise registration and error paths.
-- The scripts under `scripts/` operate on the local `data/*.txt` JSON files; they are not connected to the on-chain state by default. Use `scripts/deploy.js` plus a quick `scripts/registerOnChain.js` (not included) to sync local data to chain if needed.
-- If you get an error about versions or `deployed()` vs `waitForDeployment()`, ensure your Hardhat and Ethers versions match the ones in `package.json`.
+Sync users and land from `data/*.txt` to the deployed contract:
+
+```bash
+npm run sync-onchain -- <ContractAddress> --impersonate
+```
+
+This script does the following:
+
+- reads users from `data/users.txt`
+- calls `registerUser(fullName, wallet, role)` as registrar
+- reads lands from `data/lands.txt`
+- calls `registerLand(title, location, size, ownerId)` as registrar
+- when `price > 0`, impersonates the owner wallet and calls `listLand(landId, price)`
+
+> Note: `--impersonate` is only required for the owner wallet listing step on a local Hardhat node.
+>
+> The script does not impersonate user wallets for registration; it uses the registrar deployer account to perform `registerUser` and `registerLand`.
+
+### 7. Run the full escrow flow
+
+After syncing data, the contract supports this flow:
+
+1. Registrar registers users and land.
+2. Seller lists land for sale.
+3. Buyer initiates a purchase.
+4. Buyer funds the escrow.
+5. Registrar approves the sale.
+6. Registrar finalizes ownership transfer and payment release.
+7. Registrar can reverse and refund if needed.
+
+## How to Run Tests
+
+```bash
+npm test
+```
+
+This verifies:
+
+- registrar control and ownership
+- registrar registration of users and land
+- seller listing
+- buyer purchase initiation and escrow payment
+- registrar approval and finalization
+- registrar reversal and refund
+
+### Testing registrar-only authorization
+
+The test suite includes explicit tests that verify registrar-only constraints. Run the full suite to confirm:
+
+**Registrar-only functions tested:**
+
+1. `registerUser(fullName, wallet, role)` — Registrar-only
+   - Test: "should revert when non-registrar tries to register a user"
+   - Non-registrar attempt throws `Unauthorized` error
+
+2. `registerLand(title, location, size, ownerId)` — Registrar-only
+   - Test: "should revert when non-registrar tries to register land"
+   - Non-registrar attempt throws `Unauthorized` error
+
+3. `approveSale(transactionId)` — Registrar-only
+   - Tested as part of "should emit SaleApproved and TransferCompleted when registrar finalizes"
+   - Only registrar can move transaction from `Funded` to `Approved`
+
+4. `finalizeTransaction(transactionId)` — Registrar-only
+   - Tested as part of "should emit SaleApproved and TransferCompleted when registrar finalizes"
+   - Only registrar can transfer ownership and release funds
+
+5. `reverseTransaction(transactionId)` — Registrar-only
+   - Tested as part of "should emit TransactionReversed when registrar cancels a funded transaction"
+   - Only registrar can refund and cancel transactions
+
+**Example: How authorization is tested**
+
+```javascript
+it("should revert when non-registrar tries to register a user", async function () {
+    await expect(
+        escrow.connect(seller).registerUser("Attacker", seller.address, 0)
+    ).to.be.revertedWithCustomError(escrow, "Unauthorized");
+});
+```
+
+This test confirms that a seller account cannot call `registerUser`. Only the registrar (contract deployer) can succeed.
+
+### Understanding "already registered" messages
+
+When running `npm run sync-onchain` multiple times on the same contract instance:
+
+```
+Registering user Gabriel N. as 0x0000000000000000000000000000000000000001
+ -> no UserRegistered event found (maybe already registered)
+```
+
+This means:
+- The contract already has this user registered (from a previous `sync-onchain` run)
+- The `registerUser` call was rejected by the contract (duplicate wallet check in `registerUser`)
+- The event was not emitted because the transaction reverted
+- This is expected behavior and is not an error
+
+To start fresh, redeploy the contract with `npm run deploy` and then run `npm run sync-onchain` again.
+
+## Manual Testing: Registrar vs Non-Registrar
+
+The easiest way to test registrar-only constraints is to run the dedicated test script:
+
+### Quick start: Run the registrar control tests
+
+Start a Hardhat node in one terminal:
+
+```bash
+npx hardhat node
+```
+
+In another terminal, run the test script:
+
+```bash
+npm run test:registrar
+```
+
+This script will:
+1. Deploy a fresh contract
+2. Test registrar CAN register users
+3. Test non-registrar CANNOT register users
+4. Test registrar CAN register land
+5. Test non-registrar CANNOT register land
+6. Run a complete escrow flow with approval and finalization
+7. Test that non-registrar cannot approve sales
+
+Expected output:
+```
+========================================
+Testing Registrar Control
+========================================
+
+Accounts:
+  Registrar (deployer): 0x...
+  Seller:               0x...
+  Buyer:                0x...
+
+Deploying fresh LandSaleEscrow contract...
+✓ Deployed to: 0x...
+
+TEST 1: Registrar registers a user
+----------------------------------
+✓ User registered with ID 1: Alice (Seller)
+
+TEST 2: Registrar registers a second user
+----------------------------------------
+✓ User registered with ID 2: Bob (Buyer)
+
+TEST 3: Seller tries to register a user (should fail)
+----------------------------------------------------
+✓ Seller blocked with Unauthorized error
+
+TEST 4: Registrar registers land
+--------------------------------
+✓ Land registered with ID 1: Green Plot
+
+TEST 5: Buyer tries to register land (should fail)
+--------------------------------------------------
+✓ Buyer blocked with Unauthorized error
+
+TEST 6: Seller lists their land for sale
+--------------------------------------
+✓ Land listed for 1.0 ETH
+
+TEST 7: Full escrow flow (initiate → pay → approve → finalize)
+-------------------------------------------------------------
+  ✓ Buyer initiated purchase (transaction ID: 1)
+  ✓ Buyer paid 1.0 ETH into escrow
+  ✓ Registrar approved the sale
+  ✓ Registrar finalized transaction
+  ✓ Seller received payment (balance increased)
+  ✓ Land ownership changed from user 1 to user 2
+
+TEST 8: Buyer tries to approve a sale (should fail)
+--------------------------------------------------
+✓ Seller blocked with Unauthorized error
+
+========================================
+All tests complete!
+========================================
+```
+
+### Detailed script location
+
+The test script is located at: `scripts/testRegistrarControl.js`
+
+You can also run it directly:
+
+```bash
+npx hardhat run scripts/testRegistrarControl.js --network localhost
+```
+
+This approach is cleaner than using Hardhat console interactively, since it:
+- Deploys a fresh contract each time
+- Eliminates "already registered" errors
+- Provides clear pass/fail output for each test
+- Demonstrates all registrar authorization scenarios
+
+## Contract Function Summary
+
+### Contract events
+
+The following events are defined in `contracts/LandSaleEscrow.sol`:
+
+- `UserRegistered(uint256 userId, address wallet)`
+- `LandRegistered(uint256 landId, uint256 ownerId)`
+- `LandListed(uint256 landId, uint256 price)`
+- `PurchaseInitiated(uint256 transactionId, uint256 landId, uint256 buyerId)`
+- `PaymentFunded(uint256 transactionId, uint256 amount)`
+- `SaleApproved(uint256 transactionId)`
+- `TransferCompleted(uint256 transactionId, uint256 landId, uint256 fromOwnerId, uint256 toOwnerId)`
+- `TransactionReversed(uint256 transactionId)`
+
+### Registrar functions
+
+- `registerUser(fullName, wallet, role)` — create a user record for the given wallet
+- `registerLand(title, location, size, ownerId)` — create a land record for a seller
+- `approveSale(transactionId)` — approve a funded escrow
+- `finalizeTransaction(transactionId)` — transfer land and release funds
+- `reverseTransaction(transactionId)` — refund the buyer and restore listing
+
+### Seller functions
+
+- `listLand(landId, price)` — put land up for sale
+
+### Buyer functions
+
+- `initiatePurchase(landId)` — create a transaction record
+- `payForTransaction(transactionId)` — fund the transaction
+
+### Read functions
+
+- `getUser(userId)` — return user details
+- `getLand(landId)` — return land details
+- `getTransaction(transactionId)` — return transaction details
+
+## Notes
+
+- The registrar is the only account that can create users and land on-chain.
+- Sellers can only list land they own.
+- Buyers can only initiate and fund purchases for listed land.
+- The escrow funds stay in contract balance until registrar approves or reverses.
+- `data/*.txt` is local dummy data and is separate from on-chain state.
