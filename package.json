@@ -46,7 +46,7 @@
     "all-transactions": "node scripts/getAllTransactions.js",
     "sync-transactions": "node scripts/syncTransactions.js",
     "dashboard": "node scripts/getDashboard.js",
-    "sync-onchain": "node scripts/registerOnChain.js"
+    "sync-onchain": "HARDHAT_NETWORK=localhost node scripts/registerOnChain.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.2",
