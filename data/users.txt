@@ -12,12 +12,5 @@
     "wallet": "0x0000000000000000000065000000000000000002",
     "role": "Buyer",
     "exists": true
-  },
-  {
-    "id": 3,
-    "fullName": "Mugenzi Christine",
-    "wallet": "0x0000000000000000000065000000000000000092",
-    "role": "Registrar",
-    "exists": true
   }
 ]

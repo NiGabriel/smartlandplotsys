@@ -33,18 +33,41 @@ The contract deployer is the registrar. Registrar-only functions include:
 Seller responsibilities:
 
 - register land via registrar
-- list land for sale with `listLand(landId, price)`
-- inspect land via `getLand(landId)`
+- list land for sale with `listLand(landId, price)` **_(sets price in ETH)_**
+- inspect land via `getLand(landId)` **_(displays current owner and price)_**
 - verify transaction progress via `getTransaction(transactionId)`
 
 ### Buyer
 
 Buyer responsibilities:
 
-- verify land using `getLand(landId)`
+- verify land using `getLand(landId)` **_(displays current owner, listing price, and status)_**
 - initiate purchase with `initiatePurchase(landId)`
-- pay escrow using `payForTransaction(transactionId)`
+- pay escrow using `payForTransaction(transactionId)` **_(transfers ETH to contract escrow)_**
 - verify progress using `getTransaction(transactionId)`
+
+## Price & ETH Management
+
+The system manages land prices entirely in **Ethereum (ETH)**:
+
+- **Listing Price**: When a seller calls `listLand(landId, price)`, the `price` parameter is specified in Wei (smallest ETH unit). Use `npm run list-land -- <contractAddress> <landId> <priceInEther>` to specify price in ETH (e.g., `1.5` for 1.5 ETH).
+
+- **Price Tracking**: Each transaction records the exact amount in ETH. View price history and all offers for a land with `npm run price-history`.
+
+- **Ownership Changes**: When a transaction is completed:
+  - Seller receives their full listed price in ETH (funds are held in contract escrow until finalization)
+  - Land ownership transfers to buyer
+  - Land status changes to "Sold"
+
+- **Price History**: Track all listing prices, offers, and completed sales for any land using the price history and transaction tracking commands.
+
+- **Transaction Volume**: All transaction amounts are tracked and can be viewed with `npm run all-transactions` to see total volume in ETH.
+
+- **Fund Management**:
+  - Buyer funds are held in contract escrow when `payForTransaction()` is called
+  - Registrar can approve or reverse transactions
+  - On approval + finalization, funds are released to seller
+  - On reversal, funds are refunded to buyer
 
 ## Setup
 
@@ -59,22 +82,70 @@ npm run compile
 
 Dummy data is stored in:
 
-- `data/users.txt`
-- `data/lands.txt`
+- `data/users.txt` — users and their roles (Seller, Buyer, Registrar)
+- `data/lands.txt` — land properties and ownership
+- `data/accounts.txt` — blockchain accounts with private keys and initial ETH balances
+- `data/transactions.txt` — recorded transaction history (synced from blockchain)
 
-These files are JSON arrays used by local scripts for testing and syncing.
+These files are JSON arrays used by local scripts for testing, syncing, and auditing.
 
 ## Available Scripts
+
+### Compilation & Testing
 
 - `npm run compile` — compile contracts
 - `npm test` — run unit tests
 - `npm run test:registrar` — run registrar control authorization tests (requires `npx hardhat node` running)
 - `npm run deploy` — deploy contract to localhost
+
+### Local Data Management
+
 - `npm run init-data` — create sample `data/users.txt` and `data/lands.txt`
 - `npm run fetch-data` — print local dummy data
 - `npm run add-user -- "Full Name" "Role" "0xWallet"` — add a user to local data; role must be `Seller`, `Buyer`, or `Registrar`
 - `npm run add-land -- "Title" "Location" 100 "OwnerWallet"` — add a land record locally; owner wallet must exist in `data/users.txt`
+
+### Account Management (Private Keys & ETH Balances)
+
+- `npm run init-accounts` — create sample `data/accounts.txt` with test accounts and private keys
+- `npm run fetch-accounts` — view all accounts with private keys, balances, and linked users
+- `npm run add-account -- "0xWallet" "PrivateKey" 50 [userId]` — add a blockchain account with private key and initial ETH balance (in ETH); optionally link to a user ID
+- `npm run link-account -- <accountId> <userId>` — link an existing account to a user (for buyer/seller identification)
+
+### Transaction Management (Logging & Auditing)
+
+- `npm run fetch-transactions` — view all recorded transactions (type, amount, status, participants)
+- `npm run sync-transactions -- <ContractAddress>` — extract all transactions from deployed contract and store locally in `data/transactions.txt` (idempotent — only records new transactions)
+
+### On-Chain Sync
+
 - `npm run sync-onchain -- <ContractAddress> --impersonate` — sync local data to deployed contract
+
+### Land Management
+
+- `npm run list-land -- <ContractAddress> <landId> <priceInEther> [signerAddress]` — list a land for sale at specified price (in ETH)
+- `npm run get-land -- <ContractAddress> <landId>` — retrieve land details (title, location, owner, price, status)
+
+### Purchase & Transaction Flow
+
+- `npm run initiate-purchase -- <ContractAddress> <landId> [buyerAddress]` — buyer initiates purchase for a land
+- `npm run pay-transaction -- <ContractAddress> <transactionId> <amountInEther> [buyerAddress]` — buyer pays escrow (amount must match land price)
+- `npm run approve-sale -- <ContractAddress> <transactionId> [registrarAddress]` — registrar approves funded sale
+- `npm run finalize-transaction -- <ContractAddress> <transactionId> [registrarAddress]` — registrar finalizes transaction (transfers funds to seller, updates ownership)
+- `npm run reverse-transaction -- <ContractAddress> <transactionId> [registrarAddress]` — registrar cancels transaction and refunds buyer
+
+### Query & Inspection
+
+- `npm run get-user -- <ContractAddress> <userId>` — retrieve user details (name, wallet, role)
+- `npm run get-transaction -- <ContractAddress> <transactionId>` — retrieve transaction details (amount, status, seller, buyer, timestamp)
+
+### Transaction & Price History Tracking
+
+- `npm run land-history -- <ContractAddress> <landId>` — view all transactions for a specific land (buyers, prices, statuses)
+- `npm run user-history -- <ContractAddress> <userId>` — view all transactions involving a user (as seller or buyer)
+- `npm run price-history -- <ContractAddress> <landId>` — view price history and ownership changes for a land (shows all listing prices and current owner)
+- `npm run all-transactions -- <ContractAddress>` — view all transactions in the system with summary (total transactions, completed count, total volume in ETH)
+- `npm run dashboard -- <ContractAddress>` — view comprehensive dashboard (user count by role, land count by status, transaction statistics, total transaction volume)
 
 ## Quick Start
 
@@ -82,35 +153,50 @@ These files are JSON arrays used by local scripts for testing and syncing.
 
 ```bash
 npm run init-data
+npm run init-accounts
 ```
 
 ### 2. Inspect local test data
 
 ```bash
 npm run fetch-data
+npm run fetch-accounts
 ```
 
-### 3. Add a new user locally
+### 3. Link accounts to users
+
+View the accounts and users, then link them:
 
 ```bash
-npm run add-user -- "Test User" "Buyer" "0x0000000000000000000000000000000000000003"
+npm run link-account -- 1 1
+npm run link-account -- 2 2
 ```
 
-> **Important**: Wallet addresses must be valid Ethereum addresses (40 hex characters after `0x`).
-> Invalid formats like `0xwallet` will cause the sync script to fail with a `resolveName` error.
+This links:
+- Account ID 1 (wallet 0x...0001) → User ID 1 (Seller)
+- Account ID 2 (wallet 0x...0002) → User ID 2 (Buyer)
 
-Examples of valid addresses:
-- `0x0000000000000000000000000000000000000001`
-- `0x1234567890123456789012345678901234567890`
-- `0xabcdefabcdefabcdefabcdefabcdefabcdefabcd`
+### 4. Add a new account with private key and balance
 
-### 4. Add a new land entry locally
+```bash
+npm run add-account -- "0x1234567890123456789012345678901234567890" "0x0000000000000000000000000000000000000000000000000000000000000099" 100 3
+```
+
+This creates an account with 100 ETH initial balance, linked to User ID 3.
+
+> **Important**: Each account requires:
+> - **Wallet**: Valid Ethereum address (0x + 40 hex chars)
+> - **Private Key**: 64 hex characters (use for signing transactions)
+> - **Initial Balance**: ETH amount for testing
+> - **User Link** (optional): Links the account to a user ID for buyer/seller identification
+
+### 5. Add a new land entry locally
 
 ```bash
 npm run add-land -- "Demo Plot" "North Ridge" 150 "0x0000000000000000000000000000000000000003"
 ```
 
-### 5. Deploy to a local node
+### 6. Deploy to a local node
 
 Open a terminal and start Hardhat node:
 
@@ -128,7 +214,7 @@ npm run deploy
 
 Copy the deployed contract address from the output.
 
-### 6. Sync local data to the deployed contract
+### 7. Sync local data to the deployed contract
 
 Sync users and land from `data/*.txt` to the deployed contract:
 
@@ -147,6 +233,100 @@ This script does the following:
 > Note: `--impersonate` is only required for the owner wallet listing step on a local Hardhat node.
 >
 > The script does not impersonate user wallets for registration; it uses the registrar deployer account to perform `registerUser` and `registerLand`.
+
+### 8. Sync transactions to local storage
+
+After performing transactions on-chain, extract and store them locally:
+
+```bash
+npm run sync-transactions -- <ContractAddress>
+```
+
+View all recorded transactions:
+
+```bash
+npm run fetch-transactions
+```
+
+
+
+## Usage Examples: Price Management & Transactions
+
+### List land for sale (Seller action)
+
+```bash
+npm run list-land -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1 2.5
+```
+
+This lists land ID 1 for sale at **2.5 ETH**. The seller's address must be impersonated or be the current signer.
+
+### Buyer initiates purchase
+
+```bash
+npm run initiate-purchase -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
+```
+
+This returns the transaction ID (needed for the next step).
+
+### Buyer pays into escrow (exact amount required)
+
+```bash
+npm run pay-transaction -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1 2.5
+```
+
+The buyer must pay exactly **2.5 ETH** (matching the listed price). The amount is held in contract escrow.
+
+### Registrar approves the sale
+
+```bash
+npm run approve-sale -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
+```
+
+### Registrar finalizes transaction (transfers ownership & funds)
+
+```bash
+npm run finalize-transaction -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
+```
+
+This:
+- Transfers 2.5 ETH from escrow to seller wallet
+- Updates land ownership to buyer
+- Changes land status to "Sold"
+
+### Track all prices for a land (including history)
+
+```bash
+npm run price-history -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
+```
+
+Shows:
+- All listing prices
+- All offers and their statuses
+- Current owner
+- Completed sales
+
+### View all transactions in the system
+
+```bash
+npm run all-transactions -- 0x5FbDB2315678afccb333f8a9fcff40144967d408
+```
+
+Shows:
+- Total transaction count and volume (in ETH)
+- Status breakdown (Created, Funded, Approved, Completed, Cancelled)
+- Details of each transaction
+
+### View system dashboard
+
+```bash
+npm run dashboard -- 0x5FbDB2315678afccb333f8a9fcff40144967d408
+```
+
+Shows comprehensive overview:
+- User count by role
+- Land count by status
+- Transaction statistics
+- Total transaction volume in ETH
 
 ### 7. Run the full escrow flow
 
@@ -374,3 +554,128 @@ The following events are defined in `contracts/LandSaleEscrow.sol`:
 - Buyers can only initiate and fund purchases for listed land.
 - The escrow funds stay in contract balance until registrar approves or reverses.
 - `data/*.txt` is local dummy data and is separate from on-chain state.
+
+## Complete Data Architecture
+
+The system manages four interconnected data layers for full traceability:
+
+### 1. **Users** (`data/users.txt`)
+- User profiles with roles (Seller, Buyer, Registrar)
+- Wallet addresses linked to users
+- Example: `{ id: 1, fullName: "John Doe", wallet: "0x...", role: "Seller", exists: true }`
+
+### 2. **Accounts** (`data/accounts.txt`)
+- Blockchain accounts with **private keys** and **ETH balances**
+- Can be linked to users for buyer/seller identification
+- Tracks initial balance and account linking timestamp
+- Example: `{ id: 1, wallet: "0x...", privateKey: "0x...", initialBalance: 100, userId: 1, createdAt: "...", linkedAt: "..." }`
+
+### 3. **Lands** (`data/lands.txt`)
+- Land properties: title, location, size, owner ID
+- Current status and listed price (in ETH)
+- Example: `{ id: 1, title: "Green Plot", location: "Kigali", size: 150, ownerId: 1, price: 2.5, status: "Listed" }`
+
+### 4. **Transactions** (`data/transactions.txt`)
+- All on-chain transactions extracted and stored locally
+- Includes: land title, participants (seller/buyer names), amount in ETH, status, timestamp
+- Example: `{ id: 1, chainTransactionId: "1", timestamp: "2026-06-17T...", type: "Purchase", landId: 1, landTitle: "Green Plot", sellerId: 1, sellerName: "John Doe", buyerId: 2, buyerName: "Jane Doe", amount: "2.5", status: "Completed", blockNumber: 123456 }`
+
+### Data Flow & Workflow
+
+```
+STEP 1: Account Setup
+├─ npm run init-accounts → Create accounts with private keys & ETH
+├─ npm run add-account → Add custom accounts
+└─ npm run link-account → Link accounts to users (buyer/seller)
+
+STEP 2: User & Land Setup
+├─ npm run init-data → Create users and lands
+├─ npm run add-user → Add more users
+└─ npm run add-land → Add more lands
+
+STEP 3: Deploy & Sync to Blockchain
+├─ npm run deploy → Deploy contract
+├─ npm run sync-onchain → Register users/lands on-chain
+└─ Contract now holds on-chain state
+
+STEP 4: Execute Transactions
+├─ Seller lists land (listLand)
+├─ Buyer initiates purchase (initiatePurchase)
+├─ Buyer pays escrow (payForTransaction)
+├─ Registrar approves (approveSale)
+└─ Registrar finalizes (finalizeTransaction)
+    → Ownership transfers, funds released to seller
+
+STEP 5: Record Transactions Locally
+├─ npm run sync-transactions → Extract all transactions from blockchain
+└─ All transactions now stored in data/transactions.txt for auditing
+
+STEP 6: Query & Analyze
+├─ npm run fetch-accounts → View all accounts and links
+├─ npm run fetch-transactions → View all recorded transactions
+├─ npm run land-history → View all transactions for a land
+├─ npm run user-history → View transactions for a user
+├─ npm run price-history → View price history and ownership changes
+└─ npm run dashboard → View system overview
+```
+
+### Complete Data Traceability
+
+By storing accounts, users, lands, and transactions locally, the system provides:
+
+- **Account Audit Trail**: Track which blockchain account corresponds to which user
+- **Transaction History**: Full log of all transactions with parties and amounts
+- **Price History**: Complete pricing record for each land (all offers, not just completed sales)
+- **Ownership Trail**: See how land ownership changed over time
+- **Fund Flow**: Track ETH movement from buyer accounts to escrow to seller accounts
+- **User Activity**: See all transactions involving a specific user (as buyer or seller)
+
+### Example: Tracing a Land Sale
+
+1. **Create account & link to user**:
+   ```bash
+   npm run add-account -- "0x1234...5678" "0xabcd...ef01" 100 1
+   npm run link-account -- 1 1  # Account 1 → User 1 (Seller)
+   ```
+
+2. **Register land**:
+   ```bash
+   npm run add-land -- "My Plot" "Kigali" 200 "0x1234...5678"
+   ```
+
+3. **Deploy & sync**:
+   ```bash
+   npm run deploy
+   npm run sync-onchain -- 0x5FbDB...d408
+   ```
+
+4. **Seller lists land** (100 ETH):
+   ```bash
+   npm run list-land -- 0x5FbDB...d408 1 100
+   ```
+
+5. **Buyer initiates purchase**:
+   ```bash
+   npm run initiate-purchase -- 0x5FbDB...d408 1
+   ```
+
+6. **Buyer pays escrow**:
+   ```bash
+   npm run pay-transaction -- 0x5FbDB...d408 1 100
+   ```
+
+7. **Registrar approves & finalizes**:
+   ```bash
+   npm run approve-sale -- 0x5FbDB...d408 1
+   npm run finalize-transaction -- 0x5FbDB...d408 1
+   ```
+
+8. **Sync transactions & audit**:
+   ```bash
+   npm run sync-transactions -- 0x5FbDB...d408
+   npm run fetch-transactions  # View all recorded transactions
+   npm run price-history -- 0x5FbDB...d408 1  # View land price history & ownership change
+   npm run user-history -- 0x5FbDB...d408 1  # View seller's transactions
+   ```
+
+All data is now stored and fully traceable in `data/*.txt` files.

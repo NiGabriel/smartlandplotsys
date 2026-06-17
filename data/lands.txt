@@ -18,15 +18,5 @@
     "price": 0,
     "status": "Registered",
     "exists": true
-  },
-  {
-    "id": 3,
-    "title": "Nyamasheke Plot",
-    "location": "Location",
-    "size": 100,
-    "ownerId": 3,
-    "price": 0,
-    "status": "Registered",
-    "exists": true
   }
 ]
