@@ -95,6 +95,60 @@ contract LandSaleEscrow is LandEscrowStorage, AccessModifiers, IEvents {
         emit LandListed(landId, price);
     }
 
+    function listLandForSale() public view returns (Land[] memory) {
+        uint256 count = 0;
+
+        // First pass: count listed lands
+        for (uint256 i = 0; i < landIds.length; i++) {
+            if (lands[landIds[i]].status == LandStatus.Listed) {
+                count++;
+            }
+        }
+
+        // Prepare result array
+        Land[] memory result = new Land[](count);
+        uint256 index = 0;
+
+        // Second pass: collect listed lands
+        for (uint256 i = 0; i < landIds.length; i++) {
+            Land storage land = lands[landIds[i]];
+
+            if (land.status == LandStatus.Listed) {
+                result[index] = land;
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    function listOwnLands(uint256 userId) public view returns (Land[] memory) {
+        uint256 count = 0;
+
+        // First pass: count listed lands
+        for (uint256 i = 0; i < landIds.length; i++) {
+            if (lands[landIds[i]].ownerId == userId) {
+                count++;
+            }
+        }
+
+        // Prepare result array
+        Land[] memory result = new Land[](count);
+        uint256 index = 0;
+
+        // Second pass: collect listed lands
+        for (uint256 i = 0; i < landIds.length; i++) {
+            Land storage land = lands[landIds[i]];
+
+            if (land.status == LandStatus.Listed) {
+                result[index] = land;
+                index++;
+            }
+        }
+
+        return result;
+    }
+
     function initiatePurchase(uint256 landId) public returns (uint256) {
         if (!lands[landId].exists) revert LandNotFound();
         if (lands[landId].status != LandStatus.Listed) revert InvalidData();

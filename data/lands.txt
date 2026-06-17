@@ -5,7 +5,7 @@
     "location": "Kigali City",
     "size": 120,
     "ownerId": 1,
-    "price": 0,
+    "price": 5,
     "status": "Registered",
     "exists": true
   },
@@ -15,8 +15,8 @@
     "location": "Eastern Province",
     "size": 200,
     "ownerId": 1,
-    "price": 0,
-    "status": "Registered",
+    "price": 10,
+    "status": "Listed",
     "exists": true
   }
 ]
