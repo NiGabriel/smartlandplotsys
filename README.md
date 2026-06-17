@@ -679,3 +679,17 @@ By storing accounts, users, lands, and transactions locally, the system provides
    ```
 
 All data is now stored and fully traceable in `data/*.txt` files.
+
+
+
+When listing the land
+When initiating a purchase
+
+HARDHAT_NETWORK=localhost npx hardhat console
+Welcome to Node.js v22.18.0.
+Type ".help" for more information.
+> await network.provider.request({ method: "hardhat_setBalance", params: ["0x0766109CB61Be820001a3F81746ca0e9383C1978", "0x56BC75E2D63100000"] })
+true
+> await network.provider.request({ method: "hardhat_setBalance", params: ["0x199f1E909E282Dc245a7E392c4CCBc1bA1D91705", "0x56BC75E2D63100000"] })
+true
+>

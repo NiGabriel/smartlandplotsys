@@ -13,7 +13,7 @@ async function main() {
 
     // Get all purchase initiated events
     const filter = escrow.filters.PurchaseInitiated();
-    const events = await escrow.queryFilter(filter, -10000);
+    const events = await escrow.queryFilter(filter, 0);
 
     console.log("\n=== All Transactions Report ===");
     console.log(`Total transactions: ${events.length}\n`);

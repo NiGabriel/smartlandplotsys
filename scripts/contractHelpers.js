@@ -51,16 +51,23 @@ async function resolveSigner(signerInput) {
         throw new Error(`Signer must be an address or private key; got: ${signerInput}`);
     }
 
-    try {
-        return await hre.ethers.getSigner(signerInput);
-    } catch (_err) {
-        const accounts = loadAccounts();
-        const account = accounts.find((acc) => acc.wallet.toLowerCase() === signerInput.toLowerCase());
-        if (account && account.privateKey) {
-            return new hre.ethers.Wallet(account.privateKey, provider);
-        }
-        throw new Error(`Unable to resolve signer for address ${signerInput}. Make sure the address is unlocked in Hardhat or listed in data/accounts.txt with a private key.`);
+    // Check accounts.txt FIRST — if we have a private key, use it directly,
+    // since that works regardless of whether the node knows about this account.
+    const accounts = loadAccounts();
+    const account = accounts.find((acc) => acc.wallet.toLowerCase() === signerInput.toLowerCase());
+    if (account && account.privateKey) {
+        return new hre.ethers.Wallet(account.privateKey, provider);
     }
+
+    // Only fall back to getSigner for addresses Hardhat actually knows about
+    // (its own default accounts, or ones impersonated earlier in this session).
+    const localSigners = await hre.ethers.getSigners();
+    const match = localSigners.find((s) => s.address.toLowerCase() === signerInput.toLowerCase());
+    if (match) {
+        return match;
+    }
+
+    throw new Error(`Unable to resolve signer for address ${signerInput}. Make sure the address is unlocked in Hardhat or listed in data/accounts.txt with a private key.`);
 }
 
 async function getEscrowContract(contractAddress, signerOrProvider) {

@@ -18,15 +18,5 @@
     "price": 0,
     "status": "Registered",
     "exists": true
-  },
-  {
-    "id": 3,
-    "title": "My Plot",
-    "location": "Kigali",
-    "size": 200,
-    "ownerId": 1,
-    "price": 0,
-    "status": "Registered",
-    "exists": true
   }
 ]
