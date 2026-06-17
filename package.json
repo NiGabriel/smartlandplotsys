@@ -27,6 +27,7 @@
     "fetch-data": "HARDHAT_NETWORK=localhost node scripts/fetchData.js",
     "fetch-accounts": "HARDHAT_NETWORK=localhost node scripts/fetchAccounts.js",
     "fetch-transactions": "HARDHAT_NETWORK=localhost node scripts/fetchTransactions.js",
+    "fetch-users":"node scripts/fetch-users.js",
     "add-user": "HARDHAT_NETWORK=localhost node scripts/addUser.js",
     "add-land": "HARDHAT_NETWORK=localhost node scripts/addLand.js",
     "add-account": "HARDHAT_NETWORK=localhost node scripts/addAccount.js",
