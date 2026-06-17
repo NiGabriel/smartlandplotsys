@@ -12,5 +12,22 @@
     "wallet": "0x199f1E909E282Dc245a7E392c4CCBc1bA1D91705",
     "role": "Buyer",
     "exists": true
+<<<<<<< Updated upstream
+=======
+  },
+  {
+    "id": 3,
+    "fullName": "Test User",
+    "wallet": "0x0000000000000000000000000000000000000003",
+    "role": "Buyer",
+    "exists": true
+  },
+  {
+    "id": 4,
+    "fullName": "Cyprianho",
+    "wallet": "0x0000000000000000000000000000000000000004",
+    "role": "Seller",
+    "exists": true
+>>>>>>> Stashed changes
   }
 ]
