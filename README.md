@@ -149,21 +149,29 @@ These files are JSON arrays used by local scripts for testing, syncing, and audi
 
 ## Quick Start
 
-### 1. Initialize sample data
+### 1. Deploy to a local node
+
+Open a terminal and start Hardhat node:
+
+```bash
+npx hardhat node
+```
+
+### 2. Initialize sample data
 
 ```bash
 npm run init-data
 npm run init-accounts
 ```
 
-### 2. Inspect local test data
+### 3. Inspect local test data
 
 ```bash
 npm run fetch-data
 npm run fetch-accounts
 ```
 
-### 3. Link accounts to users
+### 4. Link accounts to users
 
 View the accounts and users, then link them:
 
@@ -176,7 +184,7 @@ This links:
 - Account ID 1 (wallet 0x...0001) → User ID 1 (Seller)
 - Account ID 2 (wallet 0x...0002) → User ID 2 (Buyer)
 
-### 4. Add a new account with private key and balance
+### 5. (If you need another account) Add a new account with private key and balance
 
 ```bash
 npm run add-account -- "0x1234567890123456789012345678901234567890" "0x0000000000000000000000000000000000000000000000000000000000000099" 100 3
@@ -190,21 +198,13 @@ This creates an account with 100 ETH initial balance, linked to User ID 3.
 > - **Initial Balance**: ETH amount for testing
 > - **User Link** (optional): Links the account to a user ID for buyer/seller identification
 
-### 5. Add a new land entry locally
+### 6. (If you need another land entry) Add a new land entry locally
 
 ```bash
 npm run add-land -- "Demo Plot" "North Ridge" 150 "0x0000000000000000000000000000000000000003"
 ```
 
-### 6. Deploy to a local node
-
-Open a terminal and start Hardhat node:
-
-```bash
-npx hardhat node
-```
-
-> Note: the correct command is `npx hardhat node`. A common typo is `npx hardhart node`, which will fail with an `npm ERR! 404` error.
+### 7. Deploy to a local node
 
 Open another terminal and deploy:
 
@@ -214,7 +214,7 @@ npm run deploy
 
 Copy the deployed contract address from the output.
 
-### 7. Sync local data to the deployed contract
+### 8. Sync local data to the deployed contract
 
 Sync users and land from `data/*.txt` to the deployed contract:
 
@@ -234,7 +234,7 @@ This script does the following:
 >
 > The script does not impersonate user wallets for registration; it uses the registrar deployer account to perform `registerUser` and `registerLand`.
 
-### 8. Sync transactions to local storage
+### 9. Sync transactions to local storage
 
 After performing transactions on-chain, extract and store them locally:
 
@@ -248,42 +248,55 @@ View all recorded transactions:
 npm run fetch-transactions
 ```
 
-
-
-## Usage Examples: Price Management & Transactions
-
-### List land for sale (Seller action)
+### 10. List land for sale (Seller action)
 
 ```bash
-npm run list-land -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1 2.5
+npm run list-land -- <ContractAddress> <landId> <price> <signerAddress(seller)>
+```
+#### Example:
+```bash
+npm run list-land -- 0x3Aa5ebB10DC797CAC828524e59A333d0A371443c 2 7 0xbCa9F0033DFF27f928445eE43A9110A66F4aFe5F
 ```
 
 This lists land ID 1 for sale at **2.5 ETH**. The seller's address must be impersonated or be the current signer.
 
-### Buyer initiates purchase
-
+### 11. Buyer initiates purchase
 ```bash
-npm run initiate-purchase -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
+npm run initiate-purchase -- <ContractAddress> <landId> <signerAddress(buyer)>
+```
+#### Example:
+```bash
+npm run initiate-purchase -- 0x3Aa5ebB10DC797CAC828524e59A333d0A371443c 2 0x0E745272b07170AAa0234a2D69721EbbbaFe01e3
 ```
 
 This returns the transaction ID (needed for the next step).
 
-### Buyer pays into escrow (exact amount required)
-
+### 12. Buyer pays into escrow (exact amount required)
 ```bash
-npm run pay-transaction -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1 2.5
+npm run pay-transaction -- <ContractAddress> <TransactionID> <price> <signerAddress(buyer)>
+```
+#### Example:
+```bash
+npm run pay-transaction -- 0x3Aa5ebB10DC797CAC828524e59A333d0A371443c 1 7 0x0E745272b07170AAa0234a2D69721Ebb
+baFe01e3
 ```
 
 The buyer must pay exactly **2.5 ETH** (matching the listed price). The amount is held in contract escrow.
 
-### Registrar approves the sale
-
+### 13. Registrar approves the sale
+```bash
+npm run approve-sale -- <ContractAddress> <TransactionID>
+```
+#### Example:
 ```bash
 npm run approve-sale -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
 ```
 
-### Registrar finalizes transaction (transfers ownership & funds)
-
+### 14. Registrar finalizes transaction (transfers ownership & funds)
+```bash
+npm run finalize-transaction -- <ContractAddress> <TransactionID>
+```
+#### Example:
 ```bash
 npm run finalize-transaction -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
 ```
@@ -293,8 +306,11 @@ This:
 - Updates land ownership to buyer
 - Changes land status to "Sold"
 
-### Track all prices for a land (including history)
-
+### 15. Track all prices for a land (including history)
+```bash
+npm run price-history -- <ContractAddress> <LandID>
+```
+#### Example:
 ```bash
 npm run price-history -- 0x5FbDB2315678afccb333f8a9fcff40144967d408 1
 ```
@@ -305,8 +321,11 @@ Shows:
 - Current owner
 - Completed sales
 
-### View all transactions in the system
-
+### 16. View all transactions in the system
+```bash
+npm run all-transactions -- <ContractAddress>
+```
+#### Example:
 ```bash
 npm run all-transactions -- 0x5FbDB2315678afccb333f8a9fcff40144967d408
 ```
@@ -316,8 +335,11 @@ Shows:
 - Status breakdown (Created, Funded, Approved, Completed, Cancelled)
 - Details of each transaction
 
-### View system dashboard
-
+### 17. View system dashboard
+```bash
+npm run dashboard -- <ContractAddress>
+```
+#### Example:
 ```bash
 npm run dashboard -- 0x5FbDB2315678afccb333f8a9fcff40144967d408
 ```
@@ -328,7 +350,7 @@ Shows comprehensive overview:
 - Transaction statistics
 - Total transaction volume in ETH
 
-### 7. Run the full escrow flow
+## Run the full escrow flow
 
 After syncing data, the contract supports this flow:
 
@@ -392,23 +414,6 @@ it("should revert when non-registrar tries to register a user", async function (
 ```
 
 This test confirms that a seller account cannot call `registerUser`. Only the registrar (contract deployer) can succeed.
-
-### Understanding "already registered" messages
-
-When running `npm run sync-onchain` multiple times on the same contract instance:
-
-```
-Registering user Gabriel N. as 0x0000000000000000000000000000000000000001
- -> no UserRegistered event found (maybe already registered)
-```
-
-This means:
-- The contract already has this user registered (from a previous `sync-onchain` run)
-- The `registerUser` call was rejected by the contract (duplicate wallet check in `registerUser`)
-- The event was not emitted because the transaction reverted
-- This is expected behavior and is not an error
-
-To start fresh, redeploy the contract with `npm run deploy` and then run `npm run sync-onchain` again.
 
 ## Manual Testing: Registrar vs Non-Registrar
 
@@ -630,66 +635,23 @@ By storing accounts, users, lands, and transactions locally, the system provides
 - **Fund Flow**: Track ETH movement from buyer accounts to escrow to seller accounts
 - **User Activity**: See all transactions involving a specific user (as buyer or seller)
 
-### Example: Tracing a Land Sale
+## Testing with MetaMask
+### 1. Steps to register network in MetaMask:
+1. Open MetaMask extension
+2. Click on the dropdown at the top
+Click Networks → Add Network
+3. Fill in the details:
+- Network Name: Localhost
+- RPC URL: http://localhost:8545
+- Chain ID: 31337
+- Currency Symbol: ETH
+- Block Explorer URL:(http://localhost:8545)
+4. Click Save
 
-1. **Create account & link to user**:
-   ```bash
-   npm run add-account -- "0x1234...5678" "0xabcd...ef01" 100 1
-   npm run link-account -- 1 1  # Account 1 → User 1 (Seller)
-   ```
-
-2. **Register land**:
-   ```bash
-   npm run add-land -- "My Plot" "Kigali" 200 "0x1234...5678"
-   ```
-
-3. **Deploy & sync**:
-   ```bash
-   npm run deploy
-   npm run sync-onchain -- 0x5FbDB...d408
-   ```
-
-4. **Seller lists land** (100 ETH):
-   ```bash
-   npm run list-land -- 0x5FbDB...d408 1 100
-   ```
-
-5. **Buyer initiates purchase**:
-   ```bash
-   npm run initiate-purchase -- 0x5FbDB...d408 1
-   ```
-
-6. **Buyer pays escrow**:
-   ```bash
-   npm run pay-transaction -- 0x5FbDB...d408 1 100
-   ```
-
-7. **Registrar approves & finalizes**:
-   ```bash
-   npm run approve-sale -- 0x5FbDB...d408 1
-   npm run finalize-transaction -- 0x5FbDB...d408 1
-   ```
-
-8. **Sync transactions & audit**:
-   ```bash
-   npm run sync-transactions -- 0x5FbDB...d408
-   npm run fetch-transactions  # View all recorded transactions
-   npm run price-history -- 0x5FbDB...d408 1  # View land price history & ownership change
-   npm run user-history -- 0x5FbDB...d408 1  # View seller's transactions
-   ```
-
-All data is now stored and fully traceable in `data/*.txt` files.
-
-
-
-When listing the land
-When initiating a purchase
-
-HARDHAT_NETWORK=localhost npx hardhat console
-Welcome to Node.js v22.18.0.
-Type ".help" for more information.
-> await network.provider.request({ method: "hardhat_setBalance", params: ["0x0766109CB61Be820001a3F81746ca0e9383C1978", "0x56BC75E2D63100000"] })
-true
-> await network.provider.request({ method: "hardhat_setBalance", params: ["0x199f1E909E282Dc245a7E392c4CCBc1bA1D91705", "0x56BC75E2D63100000"] })
-true
->
+### 2. Steps to import accounts:
+1. Open MetaMask extension
+2. Click on the account icon (where a default account is shown)
+3. click Add wallet
+4. Click import an account
+5. Copy the private key from `data/accounts.txt` for the account you want to import
+6. Paste the private key into MetaMask and click Import

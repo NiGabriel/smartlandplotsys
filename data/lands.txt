@@ -4,19 +4,21 @@
     "title": "Masaka Plot",
     "location": "Kigali City",
     "size": 120,
-    "ownerId": 1,
-    "price": 5,
-    "status": "Registered",
-    "exists": true
+    "ownerId": 2,
+    "price": 2,
+    "status": "Sold",
+    "exists": true,
+    "updatedAt": "2026-06-17T20:24:48.520Z"
   },
   {
     "id": 2,
     "title": "Nyagatare Plot",
     "location": "Eastern Province",
     "size": 200,
-    "ownerId": 1,
-    "price": 10,
-    "status": "Listed",
-    "exists": true
+    "ownerId": 2,
+    "price": 30,
+    "status": "Sold",
+    "exists": true,
+    "updatedAt": "2026-06-17T20:12:19.791Z"
   }
 ]

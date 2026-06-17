@@ -1,6 +1,6 @@
 const { loadLands } = require("./dataHelpers");
 
-function listOwnLands(userId) {
+function getOwnLands(userId) {
     const lands = loadLands();
 
     // Filter lands owned by the user
@@ -16,7 +16,7 @@ const [userIdArg] = process.argv.slice(2);
 const userIdCast = Number(userIdArg);
 
 if (!userIdCast) {
-    console.error("Usage: node scripts/getUser.js <userId>");
+    console.error("Usage: npm run get-own-lands <userId>");
     process.exit(1);
 }
 if (!Number.isInteger(userIdCast) || userIdCast <= 0) {
@@ -27,7 +27,7 @@ if (!Number.isInteger(userIdCast) || userIdCast <= 0) {
 // Example usage (you must define userId or pass it via CLI)
 const userId = userIdCast;
 
-const ownLands = listOwnLands(userId);
+const ownLands = getOwnLands(userId);
 
 if (ownLands.length === 0) {
     console.log("No lands found for this user.");

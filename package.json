@@ -42,7 +42,7 @@
     "get-user": "HARDHAT_NETWORK=localhost node scripts/getUser.js",
     "get-land": "HARDHAT_NETWORK=localhost node scripts/getLand.js",
     "get-land-for-sale": "HARDHAT_NETWORK=localhost node scripts/getLandForSale.js",
-    "get-own-lands": "HARDHAT_NETWORK=localhost node scripts/listOwnLands.js",
+    "get-own-lands": "HARDHAT_NETWORK=localhost node scripts/getOwnLands.js",
     "land-history": "HARDHAT_NETWORK=localhost node scripts/getLandTransactionHistory.js",
     "user-history": "HARDHAT_NETWORK=localhost node scripts/getUserTransactionHistory.js",
     "price-history": "HARDHAT_NETWORK=localhost node scripts/getLandPriceHistory.js",

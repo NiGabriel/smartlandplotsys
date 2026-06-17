@@ -4,117 +4,152 @@ async function main() {
     const [contractAddress] = process.argv.slice(2);
 
     if (!contractAddress) {
-        console.error("Usage: node scripts/getDashboard.js <contractAddress>");
+        console.error("Usage: npm run dashboard -- <contractAddress>");
         process.exit(1);
     }
 
     const provider = hre.ethers.provider;
-    const escrow = await hre.ethers.getContractAt("LandSaleEscrow", contractAddress, provider);
+    const escrow = await hre.ethers.getContractAt(
+        "LandSaleEscrow",
+        contractAddress,
+        provider
+    );
 
     console.log("\n╔════════════════════════════════════════╗");
     console.log("║     Land Escrow System Dashboard      ║");
     console.log("╚════════════════════════════════════════╝\n");
 
-    // Get all users
-    const userFilter = escrow.filters.UserRegistered();
-    const userEvents = await escrow.queryFilter(userFilter);
+    // ----------------------------
+    // ENUM MAPPERS
+    // ----------------------------
+    const roleMap = ["Seller", "Buyer", "Registrar"];
+    const landStatusMap = ["Registered", "Listed", "Sold"];
+    const txStatusMap = ["Created", "Funded", "Approved", "Completed", "Cancelled"];
 
-    // Get all lands
-    const landFilter = escrow.filters.LandRegistered();
-    const landEvents = await escrow.queryFilter(landFilter);
-
-    // Get all transactions
-    const txFilter = escrow.filters.PurchaseInitiated();
-    const txEvents = await escrow.queryFilter(txFilter);
+    // ----------------------------
+    // EVENTS
+    // ----------------------------
+    const userEvents = await escrow.queryFilter(escrow.filters.UserRegistered());
+    const landEvents = await escrow.queryFilter(escrow.filters.LandRegistered());
+    const txEvents = await escrow.queryFilter(escrow.filters.PurchaseInitiated());
 
     console.log(`📊 System Overview`);
     console.log(`   Users: ${userEvents.length}`);
     console.log(`   Lands: ${landEvents.length}`);
     console.log(`   Transactions: ${txEvents.length}\n`);
 
-    // User summary
+    // ----------------------------
+    // USERS
+    // ----------------------------
     console.log(`\n👥 Users Summary`);
-    const uniqueUserIds = new Set();
+
     const sellers = [];
     const buyers = [];
     const registrars = [];
 
     for (const event of userEvents) {
-        const userId = event.args[0];
-        uniqueUserIds.add(userId.toString());
+        const userId = Number(event.args[0]);
+
         try {
             const user = await escrow.getUser(userId);
-            const roleMap = ["Seller", "Buyer", "Registrar"];
-            const role = roleMap[user.role] || "Unknown";
-            if (role === "Seller") sellers.push({ id: userId, name: user.fullName });
-            else if (role === "Buyer") buyers.push({ id: userId, name: user.fullName });
-            else if (role === "Registrar") registrars.push({ id: userId, name: user.fullName });
-        } catch (err) {
-            // User not found
-        }
+            const role = roleMap[Number(user.role)] || "Unknown";
+
+            if (role === "Seller") {
+                sellers.push({ id: userId, name: user.fullName });
+            } else if (role === "Buyer") {
+                buyers.push({ id: userId, name: user.fullName });
+            } else if (role === "Registrar") {
+                registrars.push({ id: userId, name: user.fullName });
+            }
+        } catch { }
     }
 
     console.log(`   Sellers: ${sellers.length}`);
-    sellers.forEach((s) => console.log(`     - ${s.name} (ID: ${s.id})`));
-    console.log(`   Buyers: ${buyers.length}`);
-    buyers.forEach((b) => console.log(`     - ${b.name} (ID: ${b.id})`));
-    console.log(`   Registrars: ${registrars.length}`);
-    registrars.forEach((r) => console.log(`     - ${r.name} (ID: ${r.id})`));
+    sellers.forEach((s) =>
+        console.log(`     - ${s.name} (ID: ${s.id})`)
+    );
 
-    // Land summary
+    console.log(`   Buyers: ${buyers.length}`);
+    buyers.forEach((b) =>
+        console.log(`     - ${b.name} (ID: ${b.id})`)
+    );
+
+    console.log(`   Registrars: ${registrars.length}`);
+    registrars.forEach((r) =>
+        console.log(`     - ${r.name} (ID: ${r.id})`)
+    );
+
+    // ----------------------------
+    // LANDS
+    // ----------------------------
     console.log(`\n🏠 Lands Summary`);
+
     const listedLands = [];
     const soldLands = [];
     const unlistedLands = [];
 
     for (const event of landEvents) {
-        const landId = event.args[0];
+        const landId = Number(event.args[0]);
+
         try {
             const land = await escrow.getLand(landId);
-            if (land.status === "Sold") {
+            const status = Number(land.status);
+
+            if (status === 2) {
                 soldLands.push(land);
-            } else if (land.status === "Listed") {
+            } else if (status === 1) {
                 listedLands.push(land);
             } else {
                 unlistedLands.push(land);
             }
-        } catch (err) {
-            // Land not found
-        }
+        } catch { }
     }
 
     console.log(`   Total Lands: ${landEvents.length}`);
+
     console.log(`   Listed for Sale: ${listedLands.length}`);
-    listedLands.forEach((l) => console.log(`     - ${l.title} @ ${hre.ethers.formatEther(l.price)} ETH (${l.size} sqm)`));
+    listedLands.forEach((l) =>
+        console.log(
+            `     - ${l.title} @ ${hre.ethers.formatEther(l.price)} ETH (${l.size} sqm)`
+        )
+    );
+
     console.log(`   Sold: ${soldLands.length}`);
     console.log(`   Not Listed: ${unlistedLands.length}`);
 
-    // Transaction summary
+    // ----------------------------
+    // TRANSACTIONS
+    // ----------------------------
     console.log(`\n💱 Transaction Summary`);
-    const statusMap = ["Created", "Funded", "Approved", "Completed", "Cancelled"];
+
     const statusCounts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
     let totalVolume = 0n;
     let completedCount = 0;
 
     for (const event of txEvents) {
-        const txId = event.args[0];
+        const txId = Number(event.args[0]);
+
         try {
             const tx = await escrow.getTransaction(txId);
-            statusCounts[tx.status]++;
-            if (tx.status === 3) {
-                totalVolume += tx.amount;
+            const status = Number(tx.status);
+
+            statusCounts[status]++;
+
+            if (status === 3) {
+                totalVolume += BigInt(tx.amount);
                 completedCount++;
             }
-        } catch (err) {
-            // Transaction not found
-        }
+        } catch { }
     }
 
-    Object.keys(statusCounts).forEach((status) => {
-        console.log(`   ${statusMap[status]}: ${statusCounts[status]}`);
+    Object.keys(statusCounts).forEach((s) => {
+        console.log(`   ${txStatusMap[s]}: ${statusCounts[s]}`);
     });
+
     console.log(`\n   Completed Transactions: ${completedCount}`);
-    console.log(`   Total Volume: ${hre.ethers.formatEther(totalVolume)} ETH`);
+    console.log(
+        `   Total Volume: ${hre.ethers.formatEther(totalVolume)} ETH`
+    );
 
     console.log(`\n════════════════════════════════════════\n`);
 }

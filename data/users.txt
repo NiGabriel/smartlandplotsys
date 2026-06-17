@@ -2,14 +2,14 @@
   {
     "id": 1,
     "fullName": "MAHEREZO Joseph",
-    "wallet": "0x0766109CB61Be820001a3F81746ca0e9383C1978",
+    "wallet": "0xADB91560273b886d8634b2D9e02bC5735f33C78A",
     "role": "Seller",
     "exists": true
   },
   {
     "id": 2,
     "fullName": "Aisha Kagwa",
-    "wallet": "0x199f1E909E282Dc245a7E392c4CCBc1bA1D91705",
+    "wallet": "0x4ed0Eb69a5600Aa7b26B4634B8c9e1B5e5644254",
     "role": "Buyer",
     "exists": true
   }

@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "id": 1,
+    "timestamp": "2026-06-17T20:00:05.304Z",
+    "type": "PURCHASE_INITIATED",
+    "transactionId": "1",
+    "landId": "2",
+    "sellerId": "1",
+    "buyerId": "2",
+    "amount": "30.0",
+    "status": "Approved",
+    "txHash": "0x17a424812e4c0d31d2b7d190545d1b6034a150d8d92d84cef278a5bf3fe8fde5",
+    "updatedAt": "2026-06-17T20:09:30.410Z"
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-06-17T20:21:08.573Z",
+    "type": "PURCHASE_INITIATED",
+    "transactionId": "2",
+    "landId": "1",
+    "sellerId": "1",
+    "buyerId": "2",
+    "amountWei": "2000000000000000000",
+    "amountEth": "2.0",
+    "status": "Approved",
+    "txHash": "0xaf690a943dbe1b6bbe879d47fd84402c682e5195f8b8a75e0e1b89fb903fef94",
+    "amount": "2.0",
+    "updatedAt": "2026-06-17T20:24:26.145Z"
+  }
+]

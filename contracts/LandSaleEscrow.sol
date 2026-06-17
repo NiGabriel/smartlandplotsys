@@ -122,7 +122,7 @@ contract LandSaleEscrow is LandEscrowStorage, AccessModifiers, IEvents {
         return result;
     }
 
-    function listOwnLands(uint256 userId) public view returns (Land[] memory) {
+    function getOwnLands(uint256 userId) public view returns (Land[] memory) {
         uint256 count = 0;
 
         // First pass: count listed lands
